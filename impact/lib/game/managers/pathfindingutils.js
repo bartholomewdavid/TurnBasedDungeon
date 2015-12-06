@@ -35,10 +35,10 @@ ig.PathfindingUtils = ig.Class.extend({
 		
 		for (var y = 0; y < collisionData.length; y++) {
 			for (var x = 0; x < collisionData[y].length; x++) {
-				// If walkable tile (has a floor)
-				var output = this.generateWalkNode({x: x, y: y}, collisionData)
-				checkedPositions.concat(output)
-				//if (output.length > 3) return
+				// Only check tiles that havent been checked yet
+				if (_.findWhere(checkedPositions, {x: x, y: y}) === undefined) {	
+					checkedPositions = checkedPositions.concat(this.generateWalkNode({x: x, y: y}, collisionData))
+				}
 			}
 		}
 	},
@@ -52,35 +52,9 @@ ig.PathfindingUtils = ig.Class.extend({
 		if (utils.isWalkable(position, collisionData)) {
 			// Proceed only is initial position is walkable
 			// Add initial position to the list
-			positionsForNode.push(position)
-			
-			var newPosition = _.clone(position)
-			while (true) {
-				// Check all positions to the left
-				newPosition.x--
-				if (newPosition.x < 0 || newPosition.x >= collisionData.length-1) break;
-				// Add all nodes to checked list
-				checkedNodes.push(newPosition)
-				if (utils.isWalkable(newPosition, collisionData)) {
-					positionsForNode.push(_.clone(newPosition))
-				} else {
-					break;
-				}
-			}
-			// Check all positions to the right
-			newPosition = _.clone(position)
-			while (true) {
-				// Check all positions to the left
-				newPosition.x++
-				if (newPosition.x < 0 || newPosition.x >= collisionData.length-1) break;
-				// Add all nodes to checked list
-				checkedNodes.push(newPosition)
-				if (utils.isWalkable(newPosition, collisionData)) {
-					positionsForNode.push(_.clone(newPosition))
-				} else {
-					break;
-				}
-			}
+			positionsForNode.push(_.clone(position))
+			this.walkableIterator(_.clone(position), collisionData, -1, 0, checkedNodes, positionsForNode)
+			this.walkableIterator(_.clone(position), collisionData, 1, 0, checkedNodes, positionsForNode)
 		}
 		// If more then 1 position is found, make a walk node
 		if (positionsForNode.length > 1) {
@@ -89,7 +63,22 @@ ig.PathfindingUtils = ig.Class.extend({
 
 		// Return list of checked positions
 		return checkedNodes
-		
+	},
+	
+	walkableIterator: function(position, collisionData, xIter, yIter, checkedNodes, positionsForNode) {
+		while (true) {
+			// Check all positions to the left
+			position.x += xIter
+			position.y += yIter
+			if (position.x < 0 || position.x >= collisionData.length-1) break;
+			// Add all nodes to checked list
+			checkedNodes.push(_.clone(position))
+			if (this.utils.isWalkable(position, collisionData)) {
+				positionsForNode.push(_.clone(position))
+			} else {
+				break;
+			}
+		}
 	}
 })
 

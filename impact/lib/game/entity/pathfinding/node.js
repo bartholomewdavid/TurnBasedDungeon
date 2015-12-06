@@ -59,9 +59,6 @@ EntityNode = ig.Entity.extend({
         
         this.pos.x = (maxX-.5) * this.sizeMultiple
         this.pos.y = (maxY+.5) * this.sizeMultiple
-        
-        console.log(coords)
-        console.log(this)
     }
 });
 
