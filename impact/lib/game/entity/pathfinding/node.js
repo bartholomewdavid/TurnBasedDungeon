@@ -17,8 +17,11 @@ EntityNode = ig.Entity.extend({
     gravityFactor: 0,
 
     init: function( x, y, settings ) {
-        this.addAnim( 'idle', 0.1, [0] );
-        this.parent( x, y, settings );
+        this.addAnim( 'horizontal', 0.1, [0] )
+        this.addAnim( 'climb1', 0.1, [1] )
+        this.addAnim( 'climb2', 0.1, [2] )
+        this.parent( x, y, settings )
+        this.currentAnim = this.anims[settings.type]
     },
 
     update: function() {
@@ -54,11 +57,10 @@ EntityNode = ig.Entity.extend({
         this.size.x = this.width * this.sizeMultiple
         this.size.y = this.height * this.sizeMultiple
         
-        this.offset.x = this.size.x / 2
-        this.offset.y = this.size.y / 2
+        this.pos.x = (maxX * this.sizeMultiple) - ((this.width-1) * this.sizeMultiple)
+        this.pos.y = (maxY * this.sizeMultiple) - ((this.height-1) * this.sizeMultiple)
         
-        this.pos.x = (maxX-.5) * this.sizeMultiple
-        this.pos.y = (maxY+.5) * this.sizeMultiple
+        return this
     }
 });
 
