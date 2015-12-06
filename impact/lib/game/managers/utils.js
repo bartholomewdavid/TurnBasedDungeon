@@ -35,7 +35,7 @@ ig.Utils = ig.Class.extend({
 		var belowRight = (((pos.y + 1) <= maxY) && ((pos.x + 1) <= maxX)) ?  collisionData[pos.y+1][pos.x+1] : undefined;
 		var center = ((pos.x) >= 0) ? collisionData[pos.y][pos.x] : undefined;
 		
-		//ITS LIKE A NUMPAD! EVEN BASE 1
+		//ITS LIKE A NUMPAD! It even starts at 1
 		return [undefined, belowLeft, below, belowRight, left, center, right, aboveLeft, above, aboveRight];
 	},
 	
