@@ -4,14 +4,14 @@ ig.module(
   .requires(
   'impact.impact',
   'game.managers.utils',
-  'game.entity.pathfinding.node',
+  'game.entity.pathfinding.nodegroup',
   'plugins.underscore'
   )
   .defines(function() {
 
     ig.PathfindingUtils = ig.Class.extend({
       utils: undefined,
-      nodes: [],
+      nodeGroups: [],
 
       staticInstantiate: function() {
         if (ig.PathfindingUtils.instance == undefined) {
@@ -27,30 +27,30 @@ ig.module(
         this.utils = new ig.Utils()
       },
 
-      generateNodes: function(collisionData) {
+      generateNodeGroups: function(collisionData) {
         // Generate nodes completely if doing this over again
-        this.nodes.forEach(function(entity) {
+        this.nodeGroups.forEach(function(entity) {
           ig.game.removeEntity(entity)
         })
 
-        this.generateWalkNodes(collisionData)
-        this.generateClimbNodes(collisionData)
+        this.generateWalkNodeGroups(collisionData)
+        this.generateClimbNodeGroups(collisionData)
       },
 
-      generateWalkNodes: function(collisionData) {
+      generateWalkNodeGroups: function(collisionData) {
         var checkedPositions = []
 
         for (var y = 0; y < collisionData.length; y++) {
           for (var x = 0; x < collisionData[y].length; x++) {
             // Only check tiles that havent been checked yet
             if (_.findWhere(checkedPositions, { x: x, y: y }) === undefined) {
-              checkedPositions = checkedPositions.concat(this.generateWalkNode({ x: x, y: y }, collisionData))
+              checkedPositions = checkedPositions.concat(this.generateWalkNodeGroup({ x: x, y: y }, collisionData))
             }
           }
         }
       },
 
-      generateWalkNode: function(position, collisionData) {
+      generateWalkNodeGroup: function(position, collisionData) {
         var checkedNodes = [position]
         var positionsForNode = []
         var utils = this.utils
@@ -65,21 +65,21 @@ ig.module(
         }
         // If more then 1 position is found, make a walk node
         if (positionsForNode.length > 1) {
-          this.nodes.push(ig.game.spawnEntity(EntityNode, 0, 0, { 'type': 'horizontal' }).setCoords(positionsForNode))
+          this.nodeGroups.push(ig.game.spawnEntity(EntityNodeGroup, 0, 0, { 'type': 'horizontal' }).setCoords(positionsForNode))
         }
 
         // Return list of checked positions
         return checkedNodes
       },
 
-      generateClimbNodes: function(collisionData) {
+      generateClimbNodeGroups: function(collisionData) {
         var checkedPositions = []
 
         for (var y = 0; y < collisionData.length; y++) {
           for (var x = 0; x < collisionData[y].length; x++) {
             // Only check tiles that havent been checked yet
             if (_.findWhere(checkedPositions, { x: x, y: y }) === undefined) {
-              checkedPositions = checkedPositions.concat(this.generateClimbNode({ x: x, y: y }, collisionData))
+              checkedPositions = checkedPositions.concat(this.generateClimbNodeGroup({ x: x, y: y }, collisionData))
             }
           }
         }
@@ -90,13 +90,13 @@ ig.module(
           for (var x = 0; x < collisionData[y].length; x++) {
             // Only check tiles that havent been checked yet
             if (_.findWhere(checkedPositions, { x: x, y: y }) === undefined) {
-              checkedPositions = checkedPositions.concat(this.generateClimbNode({ x: x, y: y }, collisionData, true))
+              checkedPositions = checkedPositions.concat(this.generateClimbNodeGroup({ x: x, y: y }, collisionData, true))
             }
           }
         }
       },
 
-      generateClimbNode: function(position, collisionData, left) {
+      generateClimbNodeGroup: function(position, collisionData, left) {
         var checkedNodes = [position]
         var positionsForNode = []
         var utils = this.utils
@@ -118,7 +118,7 @@ ig.module(
         }
         // If more then 1 position is found, make a walk node
         if (positionsForNode.length > 1) {
-          this.nodes.push(ig.game.spawnEntity(EntityNode, 0, 0, { 'type': nodeType }).setCoords(positionsForNode))
+          this.nodeGroups.push(ig.game.spawnEntity(EntityNodeGroup, 0, 0, { 'type': nodeType }).setCoords(positionsForNode))
         }
 
         // Return list of checked positions
